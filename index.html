@@ -48,9 +48,8 @@
 				We are points in space building infrastructure for critical sensemaking.
 			</div>
 
-			<div id="combined-cells"></div>
-
-			<div class="cell infoBig">
+			<!-- anchor point: injected cells go before this -->
+			<div class="cell infoBig" id="anchor">
 				For thinking in any dimension.
 			</div>
 			<div class="cell">
@@ -109,8 +108,9 @@
 				return dateB.localeCompare(dateA);
 			});
 
-			const target = document.getElementById("combined-cells");
-			allCells.forEach(cell => target.appendChild(cell.cloneNode(true)));
+			const grid = document.getElementById("nD");
+			const anchor = document.getElementById("anchor");
+			allCells.forEach(cell => grid.insertBefore(cell.cloneNode(true), anchor));
 		}
 
 		document.addEventListener("DOMContentLoaded", loadAndSort);
