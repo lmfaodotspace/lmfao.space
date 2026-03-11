@@ -47,57 +47,9 @@
 			<div class="cell infoBig">
 				We are points in space building infrastructure for critical sensemaking.
 			</div>
-			<div class="cell">
-				<a href="https://open.substack.com/pub/xdspace/p/unkept-promises?utm_campaign=post-expanded-share&utm_medium=post%20viewer"><img src="URBXD_poster1.JPG
-					"></a>
-				<div class="title">Unkept Promises</div>
-				<div class="info">a spiraling look at today's built environment.</div>
-			</div>
-			<div class="cell">
-				<a href="pp.html"><img src="XD_webres_ppposter.webp"></a>
-				<div class="title">Plastic Pilgrims</div>
-				<div class="info">xD SPACE is screening Plastic Pilgrims at La Générale on February 19, 2026.</div>
-			</div>
-			<div class="cell">
-				<a href="https://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando.html"><img src="XD_webres_accelerandocover.webp"></a>
-				<div class="title">Accelerando by Charles Stross</div>
-				<div class="info">"What kind of person can actually live on the edge of a singularity, keeping pace while all around them the world is melted down and reforged monthly, daily, hourly?"</div>
-			</div>
-			<div class="cell">
-				<a href="readeraccelerando.html"><img src="XD_webres_readerposter.webp"></a>
-				<div class="title">xD READER Accelerando</div>
-				<div class="info">xD SPACE is meeting to scan, interpret, and process Charles Stross' Accelerando every other Wednesday on the xDISCORD until March 11, 2026.</div>
-			</div>
-			<div class="cell">
-				<a href="rng.html"><img src="XD_webres_rngposter.webp"></a>
-				<div class="title">RNG</div>
-				<div class="info">xD SPACE is screening RNG at La Générale on December 12, 2025.</div>
-			</div>
-			<div class="cell">
-				<a href="cocognition.html"><img src="XD_webres_cogposter.webp"></a>
-				<div class="title">Co²gnition</div>
-				<div class="info">xD SPACE is presenting Co²gnition at La Générale on November 15, 2025.</div>
-			</div>
-			<div class="cell">
-				<a href="opensecretparis.html"><img src="XD_webres_osposter.webp"></a>
-				<div class="title">Open Secret Paris</div>
-				<div class="info">xD SPACE is hosting Open Secret at La Générale on May 30, 2025.</div>
-			</div>
-			<div class="cell">
-				<a href="flightplan.html"><img src="XD_webres_flightplan.webp"></a>
-				<div class="title">Flight Plan</div>
-				<div class="info">xD SPACE is filing its first flight plan at La Générale on May 13, 2025.</div>
-			</div>
-			<div class="cell">
-				<a href="transformersterminal.html"><img src="XD_webres_ttposter.webp"></a>
-				<div class="title">Transformers: Terminal</div>
-				<div class="info">xD SPACE is screening Transformers:Terminal at La Générale on May 11, 2025.</div>
-			</div>
-			<div class="cell">
-				<a href="manwithamoviecamera2025.html"><img src="XD_webres_mwamcposter.webp"></a>
-				<div class="title">Man With A Movie Camera (2025)</div>
-				<div class="info">xD SPACE is screening Man With A Movie Camera (2025) at La Générale on April 25, 2025.</div>
-			</div>
+
+			<div id="combined-cells"></div>
+
 			<div class="cell infoBig">
 				For thinking in any dimension.
 			</div>
@@ -132,6 +84,37 @@
 			</div>
 		</div>
 	</div>
+
+	<script>
+		async function getCells(fromFile, gridId) {
+			const res = await fetch(fromFile);
+			const text = await res.text();
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(text, "text/html");
+			const grid = doc.querySelector("#" + gridId);
+			return Array.from(grid.querySelectorAll(".cell:not(.infoBig)"));
+		}
+
+		async function loadAndSort() {
+			const [cells3d, cells2d] = await Promise.all([
+				getCells("3d.html", "threeD"),
+				getCells("2d.html", "twoD")
+			]);
+
+			const allCells = [...cells3d, ...cells2d];
+
+			allCells.sort((a, b) => {
+				const dateA = a.getAttribute("data-date") || "0000-00-00";
+				const dateB = b.getAttribute("data-date") || "0000-00-00";
+				return dateB.localeCompare(dateA);
+			});
+
+			const target = document.getElementById("combined-cells");
+			allCells.forEach(cell => target.appendChild(cell.cloneNode(true)));
+		}
+
+		loadAndSort();
+	</script>
 </body>
 
 </html>
