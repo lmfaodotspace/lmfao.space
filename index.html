@@ -86,19 +86,19 @@
 	</div>
 
 	<script>
-		async function getCells(fromFile, gridId) {
+		async function getCells(fromFile) {
 			const res = await fetch(fromFile);
 			const text = await res.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(text, "text/html");
-			const grid = doc.querySelector("#" + gridId);
+			const grid = doc.querySelector(".grid");
 			return Array.from(grid.querySelectorAll(".cell:not(.infoBig)"));
 		}
 
 		async function loadAndSort() {
 			const [cells3d, cells2d] = await Promise.all([
-				getCells("3d.html", "threeD"),
-				getCells("2d.html", "twoD")
+				getCells("3d.html"),
+				getCells("2d.html")
 			]);
 
 			const allCells = [...cells3d, ...cells2d];
@@ -113,7 +113,7 @@
 			allCells.forEach(cell => target.appendChild(cell.cloneNode(true)));
 		}
 
-		loadAndSort();
+		document.addEventListener("DOMContentLoaded", loadAndSort);
 	</script>
 </body>
 
