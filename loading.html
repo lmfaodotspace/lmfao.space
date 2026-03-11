@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+
+	<meta charset ="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="xD SPACE is for thinking in any dimension."> 
+	<meta name="author" content="xD SPACE">
+	
+	<meta name="apple-mobile-web-app-title" content="xD SPACE" >
+	<link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" >
+	<link rel="icon" type="image/svg+xml" href="favicon.svg" >
+	<link rel="shortcut icon" href="favicon.ico" >
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" >
+	<link rel="manifest" href="/site.webmanifest" >
+
+	<link rel="stylesheet" href="https://use.typekit.net/kjn1kiu.css">
+	<link rel="stylesheet" href="css/stylesheet.css" type="text/css">
+
+	<meta property="og:title" content="xD SPACE">
+	<meta property="og:description" content="xD SPACE is for thinking in any dimension.">
+	<meta property="og:image" content="XD_og.jpg">
+	<meta property="og:url" content="https://lmfao.space">
+	<meta property="og:type" content="website">
+
+	<meta name="twitter:card" content="XD_og.jpg">
+ 	<meta name="twitter:title" content="xD SPACE">
+  <meta name="twitter:description" content="xD SPACE is for thinking in any dimension.">
+  <meta name="twitter:image" content="XD_og.jpg">
+
+	<link rel="canonical" href="https://lmfao.space">
+
+	<meta name="theme-color" content="#000">
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .logo-container {
+      width: 800px;
+      height: 800px;
+      position: relative;
+    }
+    .logo {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      animation: spin 6s linear infinite;
+      transition: opacity 1s ease;
+      opacity: 0;
+    }
+    .logo.visible {
+      opacity: 1;
+    }
+    @keyframes spin {
+      from { transform: rotateY(0deg); }
+      to   { transform: rotateY(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="XD_logo_loadingscreen_blur.webp" class="logo visible" id="logo1">
+    <img src="XD_logo_loadingscreen_cablemanagement.webp" class="logo" id="logo2">
+    <img src="XD_logo_loadingscreen_citylights.webp" class="logo" id="logo3">
+    <img src="XD_logo_loadingscreen_cityskeuomorph.webp" class="logo" id="logo4">
+    <img src="XD_logo_loadingscreen_connections.webp" class="logo" id="logo5">
+    <img src="XD_logo_loadingscreen_dashboard.webp" class="logo" id="logo6">
+    <img src="XD_logo_loadingscreen_fireworks.webp" class="logo" id="logo7">
+    <img src="XD_logo_loadingscreen_party.webp" class="logo" id="logo8">
+    <img src="XD_logo_loadingscreen_turbine.webp" class="logo" id="logo9">
+  </div>
+  <script>
+    const logos = Array.from({ length: 9 }, (_, i) =>
+      document.getElementById(`logo${i + 1}`)
+    );
+    let index = 0;
+    setInterval(() => {
+      logos[index].classList.remove('visible');
+      index = (index + 1) % logos.length;
+      logos[index].classList.add('visible');
+    }, 6000);
+  </script>
+</body>
+</html>
