@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"/c/Users/Traeton/Documents/Projects/XD SPACE/00 WEBDEV/lmfao.space\" && mkdir -p assets/icons assets/images assets/loading)",
+      "Bash(cp favicon.svg assets/icons/favicon.svg)",
+      "Bash(cp favicon.ico assets/icons/favicon.ico)",
+      "Bash(cp \"favicon-96x96.png\" assets/icons/favicon-96x96.png)",
+      "Bash(cp \"apple-touch-icon.png\" assets/icons/apple-touch-icon.png)",
+      "Bash(cp \"web-app-manifest-192x192.png\" assets/icons/web-app-manifest-192x192.png)",
+      "Bash(cp XD_webres_opensecretdarkmode.webp assets/images/poster-open-secret-dark-mode.webp)",
+      "Bash(cp XD_webres_ppposter.webp assets/images/poster-plastic-pilgrims.webp)",
+      "Bash(cp XD_webres_readerposter.webp assets/images/poster-reader-accelerando.webp)",
+      "Bash(cp XD_webres_rngposter.webp assets/images/poster-rng.webp)",
+      "Bash(cp XD_webres_cogposter.webp assets/images/poster-cocognition.webp)",
+      "Bash(cp opensecretparis.html open-secret-paris.html)",
+      "Bash(cp opensecretdarkmode.html open-secret-dark-mode.html)",
+      "Bash(cp readeraccelerando.html reader-accelerando.html)",
+      "Bash(cp transformersterminal.html transformers-terminal.html)",
+      "Bash(cp manwithamoviecamera2025.html man-with-a-movie-camera-2025.html)",
+      "Bash(rm css/stylesheet.css)",
+      "Bash(rm opensecretparis.html opensecretdarkmode.html readeraccelerando.html transformersterminal.html manwithamoviecamera2025.html XD_webres_singleitemtemplate.html)",
+      "Bash(rm favicon.svg favicon.ico \"favicon-96x96.png\" \"apple-touch-icon.png\" \"web-app-manifest-192x192.png\" \"web-app-manifest-512x512.png\")",
+      "Bash(rm XD_logo_loadingscreen_blur.webp XD_logo_loadingscreen_cablemanagement.webp XD_logo_loadingscreen_citylights.webp XD_logo_loadingscreen_cityskeuomorph.webp XD_logo_loadingscreen_connections.webp XD_logo_loadingscreen_dashboard.webp XD_logo_loadingscreen_fireworks.webp XD_logo_loadingscreen_party.webp XD_logo_loadingscreen_turbine.webp)",
+      "Bash(rm XD_webres_opensecretdarkmode.webp XD_webres_ppposter.webp XD_webres_readerposter.webp XD_webres_rngposter.webp XD_webres_cogposter.webp XD_webres_osposter.webp XD_webres_flightplan.webp XD_webres_ttposter.webp XD_webres_mwamcposter.webp XD_webres_accelerandocover.webp XD_webres_digsite1.webp XD_webres_digsite2.webp URBXD_poster1.JPG XD_og.jpg XD_webres_discordQR.png)",
+      "Bash(rm XD_webtestimg2.jpg XD_webtestimg4.jpg XD_webtestimg5.jpg XD_webtestimg6.jpg XD_webtestimg8.jpg XD_webtestimg9.jpg XD_webtestimg10.jpg XD_webtestimg11.jpg)",
+      "Bash(cd \"/c/Users/Traeton/Documents/Projects/XD SPACE/00 WEBDEV/lmfao.space\" && ls -la && echo \"---\" && ls assets/icons/ && echo \"---\" && ls assets/images/ && echo \"---\" && ls assets/loading/)",
+      "Bash(rm XD_webtestimg7.gif)",
+      "Bash(cp assets/icons/favicon.ico favicon.ico)"
+    ]
+  }
+}

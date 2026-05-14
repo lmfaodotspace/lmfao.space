@@ -1,0 +1,1 @@
+This is a fairly messy repository of the website for my curatorial project xD SPACE. It needs to be cleaned up, checked for errors, refactored for consistency and maintainability while not changing appearance or functionality.
