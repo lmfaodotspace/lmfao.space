@@ -25,7 +25,18 @@
       "Bash(rm XD_webtestimg2.jpg XD_webtestimg4.jpg XD_webtestimg5.jpg XD_webtestimg6.jpg XD_webtestimg8.jpg XD_webtestimg9.jpg XD_webtestimg10.jpg XD_webtestimg11.jpg)",
       "Bash(cd \"/c/Users/Traeton/Documents/Projects/XD SPACE/00 WEBDEV/lmfao.space\" && ls -la && echo \"---\" && ls assets/icons/ && echo \"---\" && ls assets/images/ && echo \"---\" && ls assets/loading/)",
       "Bash(rm XD_webtestimg7.gif)",
-      "Bash(cp assets/icons/favicon.ico favicon.ico)"
+      "Bash(cp assets/icons/favicon.ico favicon.ico)",
+      "Bash(python -c \"from PIL import Image; img = Image.open\\('assets/images/poster-urbxd-1.jpg'\\); img.save\\('assets/images/poster-urbxd-1.webp', 'WEBP', quality=90\\); print\\('done'\\)\")",
+      "Bash(rm assets/images/XD_post_readeraccelerando.jpg)",
+      "Bash(python -c \"from PIL import Image; img = Image.open\\('assets/images/XD_post_reader17776.jpg'\\); img.save\\('assets/images/poster-reader-17776.webp', 'WEBP', quality=90\\); print\\('done'\\)\")",
+      "Bash(rm assets/images/XD_post_reader17776.jpg)",
+      "Bash(python -c \"from PIL import Image; img = Image.open\\('assets/images/ofk8u2mnqknruglwan2euaqkn4js.jpg'\\); img.save\\('assets/images/17776-cover.webp', 'WEBP', quality=90\\); print\\('done'\\)\")",
+      "Bash(rm assets/images/ofk8u2mnqknruglwan2euaqkn4js.jpg)",
+      "Bash(where ffmpeg *)",
+      "Bash(where magick *)",
+      "Bash(where cwebp *)",
+      "Bash(python -c \"from PIL import Image; print\\('Pillow available'\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }
