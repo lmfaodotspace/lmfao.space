@@ -36,7 +36,9 @@
       "Bash(where magick *)",
       "Bash(where cwebp *)",
       "Bash(python -c \"from PIL import Image; print\\('Pillow available'\\)\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-2.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-4.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-5.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-6.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-8.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-9.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-10.jpg\", \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\\\\test-11.jpg\")",
+      "Bash(cd \"C:\\\\Users\\\\Traeton\\\\Documents\\\\Projects\\\\XD SPACE\\\\00 WEBDEV\\\\lmfao.space\\\\assets\\\\images\" && rm test-2.jpg test-4.jpg test-5.jpg test-6.jpg test-8.jpg test-9.jpg test-10.jpg test-11.jpg && echo \"Done\")"
     ]
   }
 }
