@@ -1,0 +1,18 @@
+# Wrangler serves this whole directory as the website, so anything that is
+# project plumbing rather than page content has to be excluded here.
+
+# git internals — these were being published, and the pack file growing
+# past 25 MiB is what failed the deploy
+.git
+.gitignore
+.assetsignore
+
+# tooling / config
+.wrangler
+wrangler.jsonc
+node_modules
+*.md
+.DS_Store
+
+# photo masters for /tate — the page ships resized webp from tate/photos/
+assets/tate bday
