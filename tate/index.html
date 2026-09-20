@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>happy birthday tate</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#101014">
+
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%8E%88%3C/text%3E%3C/svg%3E">
+	<link rel="stylesheet" href="https://use.typekit.net/kjn1kiu.css">
+
+	<style>
+		/* ---------------------------------------------------------------
+		   one self-contained birthday page. everything it needs lives in
+		   this folder: index.html, background.webp, photos/
+		   --------------------------------------------------------------- */
+
+		:root {
+			--shot-size: clamp(64px, 12vmin, 128px);
+			--orbit-radius: clamp(150px, 41vmin, 420px);
+			--orbit-speed: 90s;
+			--ink: #fff;
+		}
+
+		*, *::before, *::after { box-sizing: border-box; }
+
+		html { -webkit-text-size-adjust: 100%; }
+
+		body {
+			margin: 0;
+			min-height: 100svh;
+			color: var(--ink);
+			font-family: "trade-gothic-next", "Franklin Gothic Medium", "Franklin Gothic",
+			             "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-weight: 400;
+			text-transform: lowercase;
+			background-color: #101014;
+		}
+
+		/* fixed background layer — steadier than background-attachment on ios */
+		body::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			z-index: -2;
+			background: url("background.webp") center / cover no-repeat;
+		}
+
+		/* --- the orbiting photos ------------------------------------------ */
+
+		.ring {
+			position: fixed;
+			inset: 0;
+			z-index: 1;
+			display: grid;
+			place-items: center;
+			pointer-events: none;   /* only the buttons are clickable */
+		}
+
+		.orbit {
+			display: grid;
+			place-items: center;
+			width: 0;
+			height: 0;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			animation: spin var(--orbit-speed) linear infinite;
+		}
+
+		.slot {
+			position: absolute;
+			/* sit at angle --a, then un-tilt so the frame stays square */
+			transform: rotate(var(--a)) translate(var(--orbit-radius)) rotate(calc(-1 * var(--a)));
+		}
+
+		.shot {
+			display: block;
+			padding: 0;
+			border: 0;
+			background: none;
+			cursor: pointer;
+			pointer-events: auto;
+			border-radius: 14px;
+			/* cancel the parent's rotation so photos never turn upside down */
+			animation: spin var(--orbit-speed) linear infinite reverse;
+		}
+
+		.shot img {
+			display: block;
+			width: var(--shot-size);
+			height: var(--shot-size);
+			object-fit: cover;
+			border-radius: 14px;
+			box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65),
+			            0 10px 30px rgba(0, 0, 0, 0.45);
+			transition: transform 0.45s ease, box-shadow 0.45s ease;
+		}
+
+		.shot:hover img,
+		.shot:focus-visible img {
+			transform: scale(1.08);
+			box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95),
+			            0 14px 40px rgba(0, 0, 0, 0.55);
+		}
+
+		.shot:focus-visible {
+			outline: 2px solid #fff;
+			outline-offset: 6px;
+		}
+
+		/* stop the carousel on hover and while a photo is enlarged */
+		.ring:hover .orbit,
+		.ring:hover .shot,
+		.ring.is-held .orbit,
+		.ring.is-held .shot {
+			animation-play-state: paused;
+		}
+
+		/* keyboard focus pauses it too, but :focus-visible rather than
+		   :focus-within — a click leaves focus on the button, which would
+		   otherwise keep the ring frozen after the photo is dismissed */
+		.ring:has(.shot:focus-visible) .orbit,
+		.ring:has(.shot:focus-visible) .shot {
+			animation-play-state: paused;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(1turn); }
+		}
+
+		/* --- the letter ---------------------------------------------------- */
+
+		.page {
+			position: relative;
+			z-index: 2;
+			display: grid;
+			place-items: center;
+			min-height: 100svh;
+			padding: clamp(2rem, 8vmin, 6rem) clamp(1rem, 5vw, 3rem);
+			pointer-events: none;   /* let photos behind the letter stay clickable */
+		}
+
+		.letter {
+			width: min(30rem, 84%);
+			text-align: center;
+			text-wrap: pretty;
+			font-size: clamp(0.88rem, 0.82rem + 0.3vw, 1.05rem);
+			line-height: 1.58;
+			letter-spacing: 0.01em;
+			/* the halo: a soft glow on the glyphs themselves */
+			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55),
+			             0 0 14px rgba(0, 0, 0, 0.5),
+			             0 0 44px rgba(0, 0, 0, 0.42);
+		}
+
+		.letter p {
+			margin: 0 0 1.15em;
+		}
+
+		.letter p:last-child {
+			margin-bottom: 0;
+		}
+
+		/* --- enlarged view -------------------------------------------------- */
+
+		.viewer {
+			width: 100vw;
+			max-width: 100vw;
+			height: 100vh;
+			height: 100svh;
+			max-height: 100vh;
+			max-height: 100svh;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: none;
+			overflow: hidden;
+			place-items: center;
+			cursor: zoom-out;
+		}
+
+		.viewer[open] {
+			display: grid;
+		}
+
+		.viewer::backdrop {
+			background: rgba(10, 10, 14, 0.72);
+			-webkit-backdrop-filter: blur(14px);
+			backdrop-filter: blur(14px);
+		}
+
+		.viewer img {
+			display: block;
+			width: auto;
+			height: auto;
+			max-width: 92vw;
+			max-height: 90vh;
+			max-height: 90svh;
+			border-radius: 10px;
+			box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+			animation: rise 0.3s ease both;
+		}
+
+		@keyframes rise {
+			from { opacity: 0; transform: scale(0.96); }
+			to   { opacity: 1; transform: none; }
+		}
+
+		/* --- respect motion preferences ------------------------------------- */
+
+		@media (prefers-reduced-motion: reduce) {
+			.orbit, .shot { animation: none; }
+			.shot img, .viewer img { transition: none; animation: none; }
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- photos orbiting behind the letter -->
+	<div class="ring" id="ring">
+		<ul class="orbit">
+			<li class="slot" style="--a: 0.0deg">
+				<button class="shot" type="button" data-full="photos/p1.webp" aria-label="Enlarge photo 1 of 7">
+					<img src="photos/p1-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 51.429deg">
+				<button class="shot" type="button" data-full="photos/p2.webp" aria-label="Enlarge photo 2 of 7">
+					<img src="photos/p2-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 102.857deg">
+				<button class="shot" type="button" data-full="photos/p3.webp" aria-label="Enlarge photo 3 of 7">
+					<img src="photos/p3-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 154.286deg">
+				<button class="shot" type="button" data-full="photos/p4.webp" aria-label="Enlarge photo 4 of 7">
+					<img src="photos/p4-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 205.714deg">
+				<button class="shot" type="button" data-full="photos/p5.webp" aria-label="Enlarge photo 5 of 7">
+					<img src="photos/p5-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 257.143deg">
+				<button class="shot" type="button" data-full="photos/p6.webp" aria-label="Enlarge photo 6 of 7">
+					<img src="photos/p6-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+			<li class="slot" style="--a: 308.571deg">
+				<button class="shot" type="button" data-full="photos/p7.webp" aria-label="Enlarge photo 7 of 7">
+					<img src="photos/p7-thumb.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
+				</button>
+			</li>
+		</ul>
+	</div>
+
+	<main class="page">
+		<article class="letter">
+			<p>I think the time we are in is one of beginnings. It happens frequently these days that I realize out of the blue that I can do something with the other hand, skip a step that I thought was essential, move something around that I assumed was fixed in place, etc. Realizations that flip thousands of days of rote memory, mindless subconscious automation on their head. They seem to be popping up more and more. I like to think that maybe every pattern we fall into is actually completely optional, and its apparent simplicity and correctness to our life is merely that, an appearance, an illusion even, some convenient lie we hold close to our hearts to make it all a bit easier.</p>
+			<p>I feel like you and I make our lives easier by rooting out all the unconscious rot in them; we strive not to tell ourselves lies. There are lies that slip through the cracks and that&#x27;s what makes life beautiful anyway.</p>
+			<p>The disappearance of the Jetta and the folding of all vehicles into the Explorer is a monumentous symbolic victory that also resembles these feelings. Literally an Explorer... like it is time to explore. The world is so big and I think we barely know anything about it.</p>
+			<p>I&#x27;m so happy for you and Maria and I can&#x27;t wait to meet her. There&#x27;s a totally different feeling in the air with you two that wasn&#x27;t there in your past relationships, like you&#x27;re captivated and equaled.</p>
+			<p>What I want most is for us to spend time together, with God&#x27;s will my visa will be worked out by winter and I&#x27;ll be able to come to Texas. I am itching to have another art and fashion and chill as hell Paris autumn with you, it was so good last year even if it was simultaneously one of the most disastrous periods of my life. Thank God you were there for that. It&#x27;s nice to be present for the trainwrecks of loved ones.</p>
+			<p>I miss you and I love you. Happy birthday Tate and see you soon, hopefully for more La Perle.</p>
+		</article>
+	</main>
+
+	<dialog class="viewer" id="viewer" aria-label="Enlarged photo">
+		<img id="viewerImg" src="" alt="">
+	</dialog>
+
+	<script>
+		(function () {
+			var ring = document.getElementById('ring');
+			var viewer = document.getElementById('viewer');
+			var viewerImg = document.getElementById('viewerImg');
+
+			ring.querySelectorAll('.shot').forEach(function (shot) {
+				var full = shot.dataset.full;
+
+				// hovering already stopped the ring — quietly fetch the big one
+				shot.addEventListener('pointerenter', function preload() {
+					new Image().src = full;
+					shot.removeEventListener('pointerenter', preload);
+				});
+
+				shot.addEventListener('click', function () {
+					viewerImg.src = full;
+					viewerImg.alt = shot.getAttribute('aria-label').replace('Enlarge ', '');
+					ring.classList.add('is-held');
+					viewer.showModal();
+				});
+			});
+
+			// safe to run more than once — every close path calls it
+			function resume() {
+				ring.classList.remove('is-held');
+				viewerImg.removeAttribute('src');
+			}
+
+			// click anywhere in the enlarged view to go back to circling
+			viewer.addEventListener('click', function () {
+				viewer.close();
+				resume();
+			});
+
+			viewer.addEventListener('cancel', resume);   // esc
+			viewer.addEventListener('close', resume);    // anything else
+		}());
+	</script>
+
+</body>
+</html>
