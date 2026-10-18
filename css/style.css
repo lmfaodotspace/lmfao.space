@@ -298,25 +298,6 @@ p {
   }
 }
 
-.popupHint {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  translate: -50%;
-  z-index: 100000;
-  width: max-content;
-  max-width: calc(100vw - 2rem);
-  margin: 0;
-  padding: 0.4rem 0.8rem;
-  border-radius: 1rem;
-  font-size: 0.85rem;
-  letter-spacing: normal;
-  text-align: center;
-  color: white;
-  background: rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-}
-
 @keyframes popIn {
   from { scale: 0.6; opacity: 0; }
 }

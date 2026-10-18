@@ -1,6 +1,7 @@
 // Poster pop-ups. A poster wrapped in <button class="popupTrigger" data-popups="a.jpg, b.webp, c.mp4">
 // opens a full-screen layer and drops the first file at a random spot. While open:
-//   - tap/click empty space to add the next file where you tapped
+//   - tap/click empty space to add the next file where you tapped; on screens wide enough,
+//     new files land only left and right of the poster's centred cell, never on it
 //     (shuffled order, no repeats until the whole set has been shown)
 //   - drag a file to move it, anywhere including off-screen
 //   - pinch (touch) or scroll/trackpad-pinch (desktop) to resize; two fingers also rotate
@@ -21,11 +22,6 @@ closeBtn.hidden = true;
 closeBtn.innerHTML =
     '<span class="popupCloseText"><span class="brandX">x</span><span class="brandName">D SPACE</span></span>';
 
-const hint = document.createElement("p");
-hint.className = "popupHint";
-hint.textContent = "tap anywhere for more · drag to move · pinch or scroll to resize";
-
-layer.append(hint);
 document.body.append(layer, closeBtn);
 
 const queues = new WeakMap(); // trigger -> files left to show, so each poster keeps its own order
@@ -57,24 +53,59 @@ function apply(el) {
     el.style.transform = `translate(${t.x}px, ${t.y}px) rotate(${t.r}deg) scale(${t.s})`;
 }
 
+// Strips of screen left and right of the poster's centred cell, where new files land so they
+// don't cover it. Returns [] when there's no room (phones), meaning anywhere goes.
+const GAP = 12; // keeps the slight rotation from tipping onto the cell
+const MIN_SIDE = 150; // narrower than this isn't worth using
+function sideZones() {
+    const cell = trigger?.closest(".singleItemWrapper");
+    if (!cell) return [];
+    const c = cell.getBoundingClientRect();
+    return [
+        { from: 0, to: c.left - GAP },
+        { from: c.right + GAP, to: innerWidth },
+    ].filter((z) => z.to - z.from >= MIN_SIDE);
+}
+
 // at = { x, y } centres the file on a tap; without it the spot is random
 function place(el, naturalW, naturalH, at) {
+    const zones = sideZones();
+    // a tap picks the strip it's in or the nearest one; otherwise pick one at random
+    const zone = !zones.length
+        ? { from: 0, to: innerWidth }
+        : at
+          ? zones.reduce((best, z) => {
+                const d = (z) => (at.x < z.from ? z.from - at.x : at.x > z.to ? at.x - z.to : 0);
+                return d(z) < d(best) ? z : best;
+            })
+          : zones[Math.floor(Math.random() * zones.length)];
+    const room = zone.to - zone.from;
     // size by the longest edge so landscape and portrait files look equally big:
     // 40–60% of the smaller screen side, or 45–65% on phones; starts fully on screen
     const side = Math.min(innerWidth, innerHeight);
     const range = innerWidth < 600 ? [0.45, 0.65] : [0.4, 0.6];
     const longest = side * (range[0] + Math.random() * (range[1] - range[0]));
     const ratio = naturalH / naturalW;
+    const r = (Math.random() - 0.5) * 12;
+    // how wide the tilted file is per pixel of width, so its corners stay in the strip too
+    const rad = Math.abs(r) * (Math.PI / 180);
+    const spread = Math.cos(rad) + ratio * Math.sin(rad);
     let w = ratio > 1 ? longest / ratio : longest;
-    w = Math.min(w, innerWidth - 16, (innerHeight - 16) / ratio);
+    w = Math.min(w, (room - 16) / spread, (innerHeight - 16) / ratio);
     const h = w * ratio;
+    const half = (w * spread) / 2;
+    // inside the strip: centred on the tap where possible, else a random spot
+    const cx = Math.min(
+        Math.max(at ? at.x : zone.from + half + Math.random() * (room - 2 * half), zone.from + half + 8),
+        zone.to - half - 8,
+    );
     el.style.width = `${w}px`;
     el.style.zIndex = ++z;
     transforms.set(el, {
-        x: at ? at.x - w / 2 : Math.random() * Math.max(0, innerWidth - w),
+        x: cx - w / 2,
         y: at ? at.y - h / 2 : Math.random() * Math.max(0, innerHeight - h),
         s: 1,
-        r: (Math.random() - 0.5) * 12,
+        r,
     });
     apply(el);
     layer.append(el);
