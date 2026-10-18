@@ -255,7 +255,33 @@ p {
   overflow: hidden;
   font: inherit;
   cursor: pointer;
-  transition: left 0.4s ease, width 0.4s ease;
+  transition: left 0.4s ease, width 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* red tint that fades in as it shrinks: like the 2D page's red nav button, a bit stronger */
+.popupClose::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2; /* under the x and the gloss */
+  border-radius: inherit;
+  background: linear-gradient(rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.3)), #fff;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.popupClose.collapsed {
+  border-color: rgba(255, 0, 0, 0.35);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.3),
+    0 0 24px 8px rgba(255, 0, 0, 0.3);
+}
+
+.popupClose.collapsed::after {
+  opacity: 1;
 }
 
 .popupClose[hidden] {
@@ -287,13 +313,15 @@ p {
 }
 
 .popupClose.instant,
-.popupClose.instant * {
+.popupClose.instant *,
+.popupClose.instant::after {
   transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .popupClose,
-  .popupClose * {
+  .popupClose *,
+  .popupClose::after {
     transition: none;
   }
 }

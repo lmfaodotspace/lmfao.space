@@ -1,5 +1,6 @@
 // Poster pop-ups. A poster wrapped in <button class="popupTrigger" data-popups="a.jpg, b.webp, c.mp4">
-// opens a full-screen layer and drops the first file at a random spot. While open:
+// opens a full-screen layer and drops the first file at a random spot. On a page with such a
+// poster, a click anywhere else (not on a link or control) opens it too, at the click. While open:
 //   - tap/click empty space to add the next file where you tapped; on screens wide enough,
 //     new files land only left and right of the poster's centred cell, never on it
 //     (shuffled order, no repeats until the whole set has been shown)
@@ -190,12 +191,12 @@ function growHome() {
     }, reduced ? 0 : MORPH_MS);
 }
 
-function open(t) {
+function open(t, at) {
     trigger = t;
     document.body.classList.add("popupsOpen");
     shrinkHome();
     closeBtn.focus();
-    addPopup();
+    addPopup(at);
 }
 
 function close() {
@@ -208,8 +209,15 @@ function close() {
 }
 
 document.addEventListener("click", (e) => {
+    if (trigger) return; // already open: the layer handles taps
     const t = e.target.closest(".popupTrigger");
-    if (t) open(t);
+    if (t) return open(t);
+    // a click anywhere else on a page with a pop-up poster opens it too, with the first file
+    // at the click; links and other controls still work, and ending a text selection doesn't count
+    const pageTrigger = document.querySelector(".popupTrigger");
+    if (!pageTrigger || e.target.closest("a, button, input, select, textarea, label")) return;
+    if (getSelection().toString()) return;
+    open(pageTrigger, { x: e.clientX, y: e.clientY });
 });
 
 closeBtn.addEventListener("click", close);
