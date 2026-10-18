@@ -245,6 +245,8 @@ article img {
 article a {
   text-decoration: none;
   color: #00f;
+  /* long handles/URLs would otherwise overflow the narrow column */
+  overflow-wrap: anywhere;
 }
 
 article a:hover {
