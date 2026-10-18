@@ -147,6 +147,12 @@ p {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* nD grid is assembled by JS; hidden until then so cells don't jump in */
+.grid.loading {
+  opacity: 0;
 }
 
 /* Grid colors */
