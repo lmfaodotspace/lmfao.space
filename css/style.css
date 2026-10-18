@@ -177,6 +177,8 @@ p {
   min-width: stretch;
   max-width: 100%;
   max-height: 100%;
+  /* width/height attributes reserve space while loading; keep the real ratio */
+  height: auto;
 }
 
 .cell img:hover {
