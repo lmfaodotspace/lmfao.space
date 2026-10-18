@@ -23,13 +23,15 @@ p {
   margin-bottom: .5rem;
 }
 
-#logox {
+#logox,
+.brandX {
   font-family: "times new roman", times, serif;
   font-style: italic;
   letter-spacing: -.13rem;
 }
 
-#logo {
+#logo,
+.brandName {
   font-weight: 800;
   letter-spacing: -.13rem;
 }
@@ -191,6 +193,129 @@ p {
   transform: perspective(600px) rotateY(-5deg) scale(1.1);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
   z-index: 100;
+}
+
+/* Poster pop-ups (js/popups.js) */
+.popupTrigger {
+  /* a bare button: looks like the poster alone */
+  all: unset;
+  display: block;
+  cursor: pointer;
+}
+
+.popupTrigger:focus-visible {
+  outline: 2px solid rgba(0, 0, 255, 0.6);
+  outline-offset: 4px;
+}
+
+.popupLayer {
+  /* full-screen canvas while open: catches taps, drags and pinches */
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+  touch-action: none;
+  cursor: copy;
+}
+
+.popupsOpen .popupLayer {
+  display: block;
+}
+
+.popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: auto;
+  max-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.25s ease-out;
+}
+
+.popup:active {
+  cursor: grabbing;
+}
+
+/* fixed copy of the xD SPACE nav button (looks from .navButton) that shrinks to its x;
+   box and text slide in opposite directions with the same timing so the x stays put */
+.popupClose {
+  position: fixed;
+  z-index: 100000;
+  box-sizing: border-box;
+  left: var(--bx);
+  width: var(--bw);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  cursor: pointer;
+  transition: left 0.4s ease, width 0.4s ease;
+}
+
+.popupClose[hidden] {
+  display: none;
+}
+
+.popupCloseText {
+  position: absolute;
+  left: var(--tx);
+  top: var(--ty);
+  z-index: -1; /* under the button's gloss, like the nav text */
+  white-space: nowrap;
+  transition: left 0.4s ease;
+}
+
+.brandName {
+  transition: opacity 0.3s ease;
+}
+
+.popupClose.collapsed .brandName {
+  opacity: 0;
+}
+
+.popupClose.instant,
+.popupClose.instant * {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popupClose,
+  .popupClose * {
+    transition: none;
+  }
+}
+
+.popupHint {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  translate: -50%;
+  z-index: 100000;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  letter-spacing: normal;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+@keyframes popIn {
+  from { scale: 0.6; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup { animation: none; }
 }
 
 .title {
