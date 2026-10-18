@@ -135,7 +135,7 @@ function shrinkHome() {
     closeBtn.style.setProperty("--ty", `${realX.top + scrollY - copyX.top}px`);
     expanded = { left: b.left, width: b.width, textLeft: tx };
     setBox(b.left, b.width, tx);
-    home.style.visibility = "hidden";
+    home.classList.add("morphHidden");
     void closeBtn.offsetWidth; // commit the start state so the change below animates
     closeBtn.classList.remove("instant");
     // shrink to a square centred on the x
@@ -151,7 +151,11 @@ function growHome() {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     morphDone = setTimeout(() => {
         closeBtn.hidden = true;
-        home.style.visibility = "";
+        // show it with no transition too, so there's no frame where neither button is visible
+        home.style.transition = "none";
+        home.classList.remove("morphHidden");
+        void home.offsetWidth;
+        home.style.transition = "";
     }, reduced ? 0 : MORPH_MS);
 }
 

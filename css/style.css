@@ -262,6 +262,13 @@ p {
   display: none;
 }
 
+/* the real nav button while its copy is out; no transition, or .navButton's
+   "transition: all" delays the hide and the full button shows behind the copy */
+.navButton.morphHidden {
+  visibility: hidden;
+  transition: none;
+}
+
 .popupCloseText {
   position: absolute;
   left: var(--tx);
