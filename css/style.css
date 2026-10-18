@@ -242,6 +242,20 @@ article img {
   margin: auto;
 }
 
+/* bullets flush with the paragraph edge, wrapped lines hang under the text */
+article ul {
+  list-style: none;
+  padding-left: 1em;
+  margin: 0 0 .5rem;
+}
+
+article li::before {
+  content: "•";
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
 article a {
   text-decoration: none;
   color: #00f;
