@@ -43,41 +43,45 @@
 			<a href="2d.html" class="navButton">2D</a>
 			<a href="1d.html" class="navButton">1D</a>
 		</div>
-		<div class="grid" id="nD">
+		<div class="grid loading" id="nD">
 			<div class="cell infoBig">
-				We are points in space building infrastructure for critical sensemaking.
+				<p>
+					We are points in space building infrastructure for critical sensemaking.
+				</p>
 			</div>
 
 			<div class="cell infoBig" id="anchor">
-				For thinking in any dimension.
+				<p>
+					For thinking in any dimension.
+				</p>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-11.webp">
+				<img src="assets/images/test-11.webp" width="1387" height="924">
 				<div class="title">Could you repeat that for me?</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-5.webp">
+				<img src="assets/images/test-5.webp" width="800" height="794">
 				<div class="title">He was bred for silence, but the truth was loud.</div>
 				<div class="info">Lies are social lubricant.</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-8.webp">
+				<img src="assets/images/test-8.webp" width="600" height="600">
 				<div class="title">He tasted the dust and knew the planet was dying.</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-9.webp">
+				<img src="assets/images/test-9.webp" width="1028" height="1414">
 				<div class="title">The signal was faint, but older than the sun.</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-6.webp">
+				<img src="assets/images/test-6.webp" width="1050" height="787">
 				<div class="title">She touched the console like it was a prayer.</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-4.webp">
+				<img src="assets/images/test-4.webp" width="1280" height="720">
 				<div class="title">They had no idea what was coming.</div>
 			</div>
 			<div class="cell">
-				<img src="assets/images/test-2.webp">
+				<img src="assets/images/test-2.webp" width="1440" height="1800">
 				<div class="title">No one remembered building the city, yet there it stood.</div>
 			</div>
 		</div>
@@ -107,12 +111,14 @@
 				return dateB.localeCompare(dateA);
 			});
 
-			const grid = document.getElementById("nD");
 			const anchor = document.getElementById("anchor");
 			allCells.forEach(cell => grid.insertBefore(cell.cloneNode(true), anchor));
 		}
 
-		document.addEventListener("DOMContentLoaded", loadAndSort);
+		// grid stays hidden until the 3D/2D cells are in, so nothing jumps;
+		// reveal it even if a fetch fails
+		const grid = document.getElementById("nD");
+		loadAndSort().finally(() => grid.classList.remove("loading"));
 	</script>
 </body>
 

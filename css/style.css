@@ -23,13 +23,15 @@ p {
   margin-bottom: .5rem;
 }
 
-#logox {
+#logox,
+.brandX {
   font-family: "times new roman", times, serif;
   font-style: italic;
   letter-spacing: -.13rem;
 }
 
-#logo {
+#logo,
+.brandName {
   font-weight: 800;
   letter-spacing: -.13rem;
 }
@@ -147,6 +149,12 @@ p {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* nD grid is assembled by JS; hidden until then so cells don't jump in */
+.grid.loading {
+  opacity: 0;
 }
 
 /* Grid colors */
@@ -177,12 +185,153 @@ p {
   min-width: stretch;
   max-width: 100%;
   max-height: 100%;
+  /* width/height attributes reserve space while loading; keep the real ratio */
+  height: auto;
 }
 
 .cell img:hover {
   transform: perspective(600px) rotateY(-5deg) scale(1.1);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
   z-index: 100;
+}
+
+/* Poster pop-ups (js/popups.js) */
+.popupTrigger {
+  /* a bare button: looks like the poster alone */
+  all: unset;
+  display: block;
+  cursor: pointer;
+}
+
+.popupTrigger:focus-visible {
+  outline: 2px solid rgba(0, 0, 255, 0.6);
+  outline-offset: 4px;
+}
+
+.popupLayer {
+  /* full-screen canvas while open: catches taps, drags and pinches */
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+  touch-action: none;
+  cursor: copy;
+}
+
+.popupsOpen .popupLayer {
+  display: block;
+}
+
+.popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: auto;
+  max-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.25s ease-out;
+}
+
+.popup:active {
+  cursor: grabbing;
+}
+
+/* fixed copy of the xD SPACE nav button (looks from .navButton) that shrinks to its x;
+   box and text slide in opposite directions with the same timing so the x stays put */
+.popupClose {
+  position: fixed;
+  z-index: 100000;
+  box-sizing: border-box;
+  left: var(--bx);
+  width: var(--bw);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  cursor: pointer;
+  transition: left 0.4s ease, width 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* red tint that fades in as it shrinks: like the 2D page's red nav button, a bit stronger */
+.popupClose::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2; /* under the x and the gloss */
+  border-radius: inherit;
+  background: linear-gradient(rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.3)), #fff;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.popupClose.collapsed {
+  border-color: rgba(255, 0, 0, 0.35);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.3),
+    0 0 24px 8px rgba(255, 0, 0, 0.3);
+}
+
+.popupClose.collapsed::after {
+  opacity: 1;
+}
+
+.popupClose[hidden] {
+  display: none;
+}
+
+/* the real nav button while its copy is out; no transition, or .navButton's
+   "transition: all" delays the hide and the full button shows behind the copy */
+.navButton.morphHidden {
+  visibility: hidden;
+  transition: none;
+}
+
+.popupCloseText {
+  position: absolute;
+  left: var(--tx);
+  top: var(--ty);
+  z-index: -1; /* under the button's gloss, like the nav text */
+  white-space: nowrap;
+  transition: left 0.4s ease;
+}
+
+.brandName {
+  transition: opacity 0.3s ease;
+}
+
+.popupClose.collapsed .brandName {
+  opacity: 0;
+}
+
+.popupClose.instant,
+.popupClose.instant *,
+.popupClose.instant::after {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popupClose,
+  .popupClose *,
+  .popupClose::after {
+    transition: none;
+  }
+}
+
+@keyframes popIn {
+  from { scale: 0.6; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup { animation: none; }
 }
 
 .title {
@@ -196,7 +345,8 @@ p {
 }
 
 .infoBig {
-  font-size: clamp(1em, 3vw + 1em, 2em);
+  /* lets the text size itself to this box's width (cqi) */
+  container-type: inline-size;
   padding: 1rem;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -204,6 +354,14 @@ p {
     0 2px 6px rgba(0, 0, 0, 0.15);
   align-content: end;
   letter-spacing: normal;
+}
+
+.infoBig p {
+  margin: 0;
+  /* same size curve as before, capped at 14% of the box so long words
+     like "infrastructure" never overflow a narrow cell */
+  font-size: clamp(1rem, min(3vw + 1rem, 14cqi), 2rem);
+  overflow-wrap: break-word;
 }
 
 article {
@@ -242,9 +400,25 @@ article img {
   margin: auto;
 }
 
+/* bullets flush with the paragraph edge, wrapped lines hang under the text */
+article ul {
+  list-style: none;
+  padding-left: 1em;
+  margin: 0 0 .5rem;
+}
+
+article li::before {
+  content: "•";
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
 article a {
   text-decoration: none;
   color: #00f;
+  /* long handles/URLs would otherwise overflow the narrow column */
+  overflow-wrap: anywhere;
 }
 
 article a:hover {
