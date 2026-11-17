@@ -46,40 +46,30 @@
 			pointer-events: none;   /* never block the button */
 		}
 
-		/* registering --zoom as a number lets it animate smoothly; without
-		   this a custom property can only jump from one value to the next */
-		@property --zoom {
-			syntax: "<number>";
-			inherits: false;
-			initial-value: 1;
-		}
-
 		.orbit > * {
 			--x: 0px;   /* where js puts the photo, from the middle of the screen */
 			--y: 0px;
+			--box: var(--thumb);   /* the square the photo is fitted into */
 			position: absolute;
 			top: 50%;
 			left: 50%;
-			max-width: var(--thumb);
-			max-height: var(--thumb);
+			max-width: var(--box);
+			max-height: var(--box);
 			width: auto;
 			height: auto;
 			display: block;
 			z-index: 1;
-			/* centre on the point, move out to it, then zoom. the zoom has to
-			   come last so the photo grows where it is: the separate `scale`
-			   property is applied around the whole transform, which tripled
-			   the photo's distance from the middle and threw it off screen */
-			transform: translate(-50%, -50%) translate(var(--x), var(--y)) scale(var(--zoom));
+			/* centre the photo on its point, then move it out to that point */
+			transform: translate(-50%, -50%) translate(var(--x), var(--y));
 			/* hidden until play is pressed */
 			opacity: 0;
 			/* on the way back down, stay on top until fully shrunk (the
-			   z-index switch waits for the zoom to finish) */
+			   z-index switch waits for the resize to finish) */
 			transition:
 				opacity 1.2s ease,
-				--zoom 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
 				z-index 0s 0.45s;
-			will-change: transform;
 		}
 
 		.orbit.is-playing > * {
@@ -87,14 +77,18 @@
 			pointer-events: auto;   /* so each photo can be pointed at */
 		}
 
-		/* the photo being looked at is blown up 3×; js adds the class */
+		/* the photo being looked at is shown 3× bigger; js adds the class.
+		   it really is resized, not scaled up with a transform: a transform
+		   just stretches the small picture the browser already drew, which
+		   looks soft, while a real resize makes it redraw from the full file */
 		.orbit > .is-zoomed {
-			--zoom: 3;
+			--box: calc(var(--thumb) * 3);
 			z-index: 3;   /* above the letter too */
 			/* on the way up, jump to the top straight away */
 			transition:
 				opacity 1.2s ease,
-				--zoom 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
 				z-index 0s;
 		}
 
@@ -314,8 +308,10 @@
 			if (item.tagName !== "IMG" || item.dataset.sharp) return;
 			item.dataset.sharp = "yes";
 			const large = new Image();
+			// once it has fully downloaded, swap it in; it comes straight from
+			// the cache then, so there's no blank moment
+			large.onload = () => { item.src = large.src; };
 			large.src = item.getAttribute("src").replace("photos/", "photos/large/");
-			large.decode().then(() => { item.src = large.src; }).catch(() => {});
 		}
 
 		function setZoom(item) {
