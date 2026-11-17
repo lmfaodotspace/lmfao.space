@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>happy thirty fabi</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#ffffff">
+
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%8E%88%3C/text%3E%3C/svg%3E">
+
+	<style>
+		/* ---------------------------------------------------------------
+		   one self-contained birthday page. everything it needs lives in
+		   this folder: index.html, song.mp3, clef.png, photos/
+		   --------------------------------------------------------------- */
+
+		:root {
+			--ink: #000;
+			--bg: #fff;
+			--button-size: clamp(140px, 40vmin, 280px);
+			--thumb: 90px;   /* set from js to suit the screen */
+		}
+
+		*, *::before, *::after { box-sizing: border-box; }
+
+		/* a treble clef for the mouse pointer; 17 1 is its tip, the spot that clicks */
+		html, .play {
+			cursor: url("clef.png") 17 1, auto;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100svh;
+			display: grid;
+			place-items: center;
+			overflow: hidden;
+			background-color: var(--bg);
+		}
+
+		/* --- the photos, travelling along a figure eight ------------------ */
+
+		.orbit {
+			position: fixed;
+			inset: 0;
+			pointer-events: none;   /* never block the button */
+		}
+
+		/* registering --zoom as a number lets it animate smoothly; without
+		   this a custom property can only jump from one value to the next */
+		@property --zoom {
+			syntax: "<number>";
+			inherits: false;
+			initial-value: 1;
+		}
+
+		.orbit > * {
+			--x: 0px;   /* where js puts the photo, from the middle of the screen */
+			--y: 0px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			max-width: var(--thumb);
+			max-height: var(--thumb);
+			width: auto;
+			height: auto;
+			display: block;
+			z-index: 1;
+			/* centre on the point, move out to it, then zoom. the zoom has to
+			   come last so the photo grows where it is: the separate `scale`
+			   property is applied around the whole transform, which tripled
+			   the photo's distance from the middle and threw it off screen */
+			transform: translate(-50%, -50%) translate(var(--x), var(--y)) scale(var(--zoom));
+			/* hidden until play is pressed */
+			opacity: 0;
+			/* on the way back down, stay on top until fully shrunk (the
+			   z-index switch waits for the zoom to finish) */
+			transition:
+				opacity 1.2s ease,
+				--zoom 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				z-index 0s 0.45s;
+			will-change: transform;
+		}
+
+		.orbit.is-playing > * {
+			opacity: 1;
+			pointer-events: auto;   /* so each photo can be hovered */
+		}
+
+		/* hovering a photo blows it up 3× */
+		.orbit > :hover {
+			--zoom: 3;
+			z-index: 3;   /* above the letter too */
+			/* on the way up, jump to the top straight away */
+			transition:
+				opacity 1.2s ease,
+				--zoom 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+				z-index 0s;
+		}
+
+		/* --- the letter, running along the outside of the ∞ -------------- */
+
+		.letter {
+			position: fixed;
+			inset: 0;
+			z-index: 2;              /* over the photos, under a hovered one */
+			width: 100%;
+			height: 100%;
+			pointer-events: none;    /* photos underneath stay hoverable */
+			overflow: hidden;
+		}
+
+		.letter text {
+			font: bold clamp(14px, 1.6vw, 20px) Arial, Helvetica, sans-serif;
+			fill: #39ff14;
+			/* a black outline drawn under the fill, so the letters stay full
+			   weight and the green pops on white and on the photos alike */
+			stroke: #000;
+			stroke-width: 3px;
+			stroke-linejoin: round;
+			paint-order: stroke;
+			white-space: pre;        /* keep the gaps between paragraphs */
+		}
+
+		/* --- rainbow notes falling in the background ---------------------- */
+
+		.notes {
+			position: fixed;
+			inset: 0;
+			z-index: 0;              /* behind the photos and the letter */
+			overflow: hidden;
+			pointer-events: none;
+		}
+
+		.notes span {
+			position: absolute;
+			top: 0;
+			font-family: Arial, "Apple Symbols", "Segoe UI Symbol", sans-serif;
+			font-variant-emoji: text;   /* plain glyph, so the colour shows */
+			line-height: 1;
+		}
+
+		/* --- the play button ---------------------------------------------- */
+
+		.play {
+			position: relative;
+			z-index: 4;   /* above everything */
+			width: var(--button-size);
+			aspect-ratio: 1;
+			display: grid;
+			place-items: center;
+			padding: 0;
+			border: 0;
+			color: var(--ink);
+			background: transparent;
+			transition: transform 0.2s ease;
+		}
+
+		/* `display: grid` above would otherwise beat the hidden attribute */
+		.play[hidden] { display: none; }
+
+		.play:hover { transform: scale(1.05); }
+
+		.play:focus-visible {
+			outline: 3px solid var(--ink);
+			outline-offset: 6px;
+		}
+
+		.play svg {
+			width: 100%;
+			fill: currentColor;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.play, .orbit > * { transition: none; }
+
+		}
+	</style>
+</head>
+
+<body>
+	<div class="orbit" aria-hidden="true">
+		<img src="photos/01.jpg" alt="">
+		<img src="photos/02.jpg" alt="">
+		<img src="photos/03.jpg" alt="">
+		<img src="photos/04.jpg" alt="">
+		<img src="photos/05.jpg" alt="">
+		<img src="photos/06.jpg" alt="">
+		<img src="photos/07.jpg" alt="">
+		<img src="photos/08.jpg" alt="">
+		<img src="photos/09.jpg" alt="">
+		<img src="photos/10.jpg" alt="">
+		<video src="photos/video.mp4" muted autoplay loop playsinline></video>
+		<img src="photos/11.jpg" alt="">
+		<img src="photos/12.jpg" alt="">
+		<img src="photos/13.jpg" alt="">
+		<img src="photos/14.jpg" alt="">
+		<img src="photos/15.jpg" alt="">
+		<img src="photos/16.jpg" alt="">
+		<img src="photos/17.jpg" alt="">
+		<img src="photos/18.jpg" alt="">
+		<img src="photos/19.jpg" alt="">
+		<img src="photos/20.jpg" alt="">
+		<img src="photos/21.jpg" alt="">
+		<img src="photos/22.jpg" alt="">
+		<img src="photos/23.jpg" alt="">
+		<img src="photos/24.jpg" alt="">
+		<img src="photos/25.jpg" alt="">
+		<img src="photos/26.jpg" alt="">
+		<img src="photos/27.jpg" alt="">
+		<img src="photos/28.jpg" alt="">
+		<img src="photos/29.jpg" alt="">
+		<img src="photos/30.jpg" alt="">
+		<img src="photos/31.jpg" alt="">
+		<img src="photos/32.jpg" alt="">
+		<img src="photos/33.jpg" alt="">
+		<img src="photos/34.jpg" alt="">
+		<img src="photos/35.jpg" alt="">
+		<img src="photos/36.jpg" alt="">
+		<img src="photos/37.jpg" alt="">
+		<img src="photos/38.jpg" alt="">
+		<img src="photos/39.jpg" alt="">
+	</div>
+
+	<div class="notes" aria-hidden="true"></div>
+
+	<!-- the letter runs along this path; js draws the path to match the ∞ -->
+	<svg class="letter" hidden>
+		<path id="letter-path" fill="none"/>
+		<text><textPath href="#letter-path">Fabi, my baby,   ·   I did not forget you. I am just late to the party. As always.   ·   As time goes by and people leave the picture (to be understood metaphorically, as the film that is my life), you remain. Which makes you one of the oldest standing trees in my tiny personal garden. And also… my oldest friend. Happy thirstiest (this was a typo, I will keep it) birthday, Fabi.   ·   It's such a sexy age. A sexy decade, really. I hope it brings you the most beautiful things in life: music, food and friendship. Oh, and good stories and literature. Great art, basically.   ·   You are probably my most beautiful and romantic friendship story. I look forward to dragging it on for many more years. I honestly can't wait to see more of the world with you, to help you climb giant birthday cakes (cf. one of the pictures), to explore musical niches, culinary feasts and fashion trends, to have endless pillow talks about our hopes and worries, to make sense of nonsense, to have a good-ass time, to goof around. To keep growing together.   ·   I love you so much.   ·   Happy birthday &lt;3</textPath></text>
+	</svg>
+
+	<button class="play" type="button" aria-label="play song">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5v17L19 12z"/></svg>
+	</button>
+
+	<audio src="song.mp3" preload="none" loop></audio>
+
+	<script>
+		/* --- play, then the button is gone -------------------------------- */
+
+		const button = document.querySelector(".play");
+		const audio = document.querySelector("audio");
+
+		button.addEventListener("click", () => {
+			// only hide the button once the song really starts,
+			// so if playback fails it is still there to try again
+			audio.play().then(() => {
+				button.hidden = true;
+				startOrbit();
+			});
+		});
+
+		/* --- the figure-eight orbit ----------------------------------------
+		   each photo sits on a lemniscate (the ∞ curve), evenly spaced, and
+		   the whole chain slides along it. on tall screens the ∞ stands up
+		   so it uses the height of the phone instead of being tiny.
+
+		   while a photo is hovered the whole ∞ eases to a stop, so the big
+		   photo stays put under the pointer, then eases back into motion.
+		   ------------------------------------------------------------------ */
+
+		const orbit = document.querySelector(".orbit");
+		const items = [...orbit.children];
+		const LAP_SECONDS = 120;   // time for one photo to go all the way round
+		const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		let size, upright;
+
+		function measure() {
+			const w = innerWidth, h = innerHeight;
+			upright = h > w;
+			const long = upright ? h : w;
+			const short = upright ? w : h;
+			// the ∞ is 2·size long and about 0.7·size across; keep both on screen
+			size = Math.min(long * 0.42, short * 1.1);
+			// the curve is about 5.2·size long; share it between the photos
+			const gap = (size * 5.2) / items.length;
+			document.documentElement.style.setProperty("--thumb", `${Math.round(gap * 1.5)}px`);
+		}
+
+		// shift: how far round the ∞ the chain has travelled, in radians
+		function place(shift) {
+			items.forEach((item, i) => {
+				const t = (i / items.length) * Math.PI * 2 + shift;
+				const s = Math.sin(t), c = Math.cos(t);
+				const d = 1 + s * s;
+				let x = (size * c) / d;
+				let y = (size * s * c) / d;
+				if (upright) [x, y] = [y, x];
+				// only the position comes from here; the css transform does the rest
+				item.style.setProperty("--x", `${x}px`);
+				item.style.setProperty("--y", `${y}px`);
+			});
+		}
+
+		// is the pointer on a photo right now?
+		let hovering = false;
+		orbit.addEventListener("pointerover", () => { hovering = true; });
+		orbit.addEventListener("pointerout", () => { hovering = false; });
+
+		const FULL_SPEED = (Math.PI * 2) / LAP_SECONDS;   // radians per second
+		let shift = 0, speed = FULL_SPEED, last;
+
+		function frame(time) {
+			const dt = last === undefined ? 0 : Math.min((time - last) / 1000, 0.1);
+			last = time;
+			// glide the speed toward stopped (hovering) or full speed;
+			// a fraction per frame gives a soft ease, about half a second
+			const target = hovering ? 0 : FULL_SPEED;
+			speed += (target - speed) * Math.min(1, dt * 6);
+			if (hovering && speed < FULL_SPEED * 0.001) speed = 0;   // settle fully
+			if (speed) {
+				shift += speed * dt;
+				place(shift);
+			}
+			requestAnimationFrame(frame);
+		}
+
+		// photos are laid out (and loading) from the start, but only shown on play
+		measure();
+		place(0);
+		addEventListener("resize", () => { measure(); place(shift); });
+
+		function startOrbit() {
+			orbit.classList.add("is-playing");
+			if (!reduceMotion) requestAnimationFrame(frame);
+			startLetter();
+		}
+
+		/* --- the letter ------------------------------------------------------
+		   the whole letter is one line of svg text laid along a path: in
+		   from the right edge, then once round a slightly larger ∞ that
+		   traces the outside of the photos. the text slides backwards along
+		   that path, so it reads like a ticker: it comes in on the right,
+		   goes round the ∞ and then carries straight on off the screen,
+		   while the rest keeps arriving. when it has all gone by, it
+		   starts again.
+		   ------------------------------------------------------------------ */
+
+		const LETTER_DELAY = 1500;   // ms after play before the text comes in
+		const LETTER_SPEED = 70;     // px per second
+
+		const letter = document.querySelector(".letter");
+		const letterPath = document.querySelector("#letter-path");
+		const letterText = letter.querySelector("textPath");
+		let pathLen = 0, textLen = 0, offset = 0, letterLast;
+
+		// a smooth curve that leaves point `from` heading in direction `dir`
+		// and bends round to point `to`; returns the points after `from`
+		function bend([fx, fy], [dx, dy], [tx, ty]) {
+			const reach = Math.hypot(tx - fx, ty - fy) * 0.5;
+			const cx = fx + dx * reach, cy = fy + dy * reach;
+			const points = [];
+			for (let k = 1; k <= 24; k++) {
+				const t = k / 24, u = 1 - t;
+				points.push([
+					u * u * fx + 2 * u * t * cx + t * t * tx,
+					u * u * fy + 2 * u * t * cy + t * t * ty,
+				]);
+			}
+			return points;
+		}
+
+		// the direction from point a to point b, as a unit vector
+		const heading = ([ax, ay], [bx, by]) => {
+			const len = Math.hypot(bx - ax, by - ay);
+			return [(bx - ax) / len, (by - ay) / len];
+		};
+
+		function drawLetterPath() {
+			const w = innerWidth, h = innerHeight;
+			letter.setAttribute("viewBox", `0 0 ${w} ${h}`);
+			const thumb = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--thumb"));
+			const big = size + thumb * 0.7;   // just outside the photos
+			const STEPS = 360;
+			const margin = 40;   // fully past the screen edge, not just touching it
+
+			// on wide screens the text joins and leaves the ∞ a little either
+			// side of its right-hand tip (EDGE radians away), along two curves
+			// that mirror each other. tall screens use the tip itself.
+			const EDGE = upright ? 0 : 0.3;
+			const skip = Math.round((STEPS * EDGE) / (Math.PI * 2));
+
+			// round the ∞ towards its right-hand tip, which keeps the entry
+			// and the top of the right loop upright
+			const loop = [];
+			for (let j = STEPS - skip; j >= skip; j--) {
+				const a = (j / STEPS) * Math.PI * 2;
+				const sn = Math.sin(a), cs = Math.cos(a), d = 1 + sn * sn;
+				let x = (big * cs) / d, y = (-big * sn * cs) / d;
+				if (upright) [x, y] = [y, x];
+				loop.push([w / 2 + x, h / 2 + y]);
+			}
+
+			// the text runs along the path backwards: it comes in at the end of
+			// the path and leaves at the start
+			const first = loop[0], last = loop[loop.length - 1];
+			let wayIn, wayOut;
+
+			if (upright) {
+				// in: straight from the right edge to the tip
+				wayIn = [[w + 20, last[1]]];
+				// out: carry straight on off the screen
+				const [dx, dy] = heading(loop[1], first);
+				const out = Math.min(
+					dx > 0 ? (w + margin - first[0]) / dx : dx < 0 ? (-margin - first[0]) / dx : Infinity,
+					dy > 0 ? (h + margin - first[1]) / dy : dy < 0 ? (-margin - first[1]) / dy : Infinity
+				);
+				wayOut = [[first[0] + dx * out, first[1] + dy * out]];
+			} else {
+				// in from the right edge just above the middle, out just below it,
+				// far enough apart that the two lines of text never touch
+				const gap = Math.max(40, big * 0.07);
+				wayIn = bend(last, heading(loop[loop.length - 2], last), [w + margin, h / 2 - gap]);
+				wayOut = bend(first, heading(loop[1], first), [w + margin, h / 2 + gap]).reverse();
+			}
+
+			const points = [...wayOut, ...loop, ...wayIn];
+			letterPath.setAttribute("d",
+				"M " + points.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L "));
+			pathLen = letterPath.getTotalLength();
+			textLen = letterText.getComputedTextLength();
+		}
+
+		function letterFrame(time) {
+			const dt = letterLast === undefined ? 0 : Math.min((time - letterLast) / 1000, 0.1);
+			letterLast = time;
+			offset -= LETTER_SPEED * dt;
+			// all of it has gone by: start again from the right edge
+			if (offset < -textLen) offset = pathLen;
+			letterText.setAttribute("startOffset", offset.toFixed(1));
+			requestAnimationFrame(letterFrame);
+		}
+
+		function startLetter() {
+			setTimeout(() => {
+				letter.hidden = false;
+				drawLetterPath();   // measuring the text needs it on screen
+				if (reduceMotion) {
+					letterText.setAttribute("startOffset", 0);   // just sits on the ∞
+				} else {
+					offset = pathLen;   // first letter just off the right edge
+					requestAnimationFrame(letterFrame);
+				}
+			}, reduceMotion ? 0 : LETTER_DELAY);
+
+			if (!reduceMotion) setInterval(dropNote, 450);
+		}
+
+		addEventListener("resize", () => { if (!letter.hidden) drawLetterPath(); });
+
+		/* --- rainbow notes ---------------------------------------------------
+		   a new note every so often, at a random spot along the top, in a
+		   random colour, size and speed. each one sways and turns a little on
+		   the way down and is removed once it has fallen off the bottom.
+		   ------------------------------------------------------------------ */
+
+		const notes = document.querySelector(".notes");
+		const NOTE_GLYPHS = ["♪", "♫", "♬", "♩"];
+		const random = (min, max) => min + Math.random() * (max - min);
+
+		function dropNote() {
+			const note = document.createElement("span");
+			note.textContent = NOTE_GLYPHS[Math.floor(Math.random() * NOTE_GLYPHS.length)];
+			note.style.left = `${random(0, 100)}%`;
+			note.style.fontSize = `${random(18, 54)}px`;
+			note.style.color = `hsl(${Math.floor(random(0, 360))} 90% 55%)`;
+			notes.append(note);
+
+			const sway = random(-60, 60), spin = random(-45, 45);
+			note.animate(
+				[
+					{ transform: "translate(-50%, -100%) rotate(0deg)" },
+					{ transform: `translate(calc(-50% + ${sway}px), 100vh) rotate(${spin}deg)` },
+				],
+				{ duration: random(6000, 14000), easing: "linear" }
+			).finished.then(() => note.remove());
+		}
+	</script>
+</body>
+
+</html>
