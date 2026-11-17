@@ -243,7 +243,7 @@
 	<!-- the letter runs along this path; js draws the path to match the ∞ -->
 	<svg class="letter" hidden>
 		<path id="letter-path" fill="none"/>
-		<text><textPath href="#letter-path">Fabi, my baby,   ·   I did not forget you. I am just late to the party. As always.   ·   As time goes by and people leave the picture (to be understood metaphorically, as the film that is my life), you remain. Which makes you one of the oldest standing trees in my tiny personal garden. And also… my <tspan font-style="italic">oldest</tspan> friend. Happy thirstiest (this was a typo, I will keep it) birthday, Fabi.   ·   It's such a sexy age. A sexy decade, really. I hope it brings you the most beautiful things in life: music, food and friendship. Oh, and good stories and literature. Great art, basically.   ·   You are probably my most beautiful and romantic friendship story. I look forward to dragging it on for many more years. I honestly can't wait to see more of the world with you, to help you climb giant birthday cakes (cf. one of the pictures), to explore musical niches, culinary feasts and fashion trends, to have endless pillow talks about our hopes and worries, to make sense of nonsense, to have a good-ass time, to goof around. To keep growing together.   ·   I love you so much.   ·   Happy birthday &lt;3</textPath></text>
+		<text><textPath href="#letter-path">Fabi, my baby,   ·   I did not forget you. I am just late to the party. As always.   ·   As time goes by and people leave the picture (to be understood metaphorically, as the film that is my life), you remain. Which makes you one of the oldest standing trees in my tiny personal garden. And also… my <tspan font-style="italic">oldest</tspan> friend. Happy thirstiest (this was a typo, I will keep it) birthday, Fabi.   ·   It's such a sexy age. A sexy decade, really. I hope it brings you the most beautiful things in life: music, food and friendship. Oh, and good stories and literature. Great art, basically.   ·   You are probably my most beautiful and romantic friendship story. I look forward to dragging it on for many more years. I honestly can't wait to see more of the world with you, to help you climb giant birthday cakes, to explore musical niches, culinary feasts and fashion trends, to have endless pillow talks about our hopes and worries, to make sense of nonsense, to have a good-ass time, to goof around. To keep growing together.   ·   I love you so much.   ·   Happy birthday &lt;3</textPath></text>
 	</svg>
 
 	<button class="play" type="button" aria-label="play song">
@@ -403,8 +403,22 @@
 			return [(bx - ax) / len, (by - ay) / len];
 		};
 
+		// the letter's full length, measured as one plain line of text off
+		// the path. measured on the path itself, safari only counts the
+		// letters currently on screen, which comes out near zero at first
+		function measureLetter() {
+			const probe = letterText.parentNode.cloneNode(true);   // the <text>
+			probe.replaceChildren(...probe.firstElementChild.childNodes);   // drop <textPath>
+			probe.setAttribute("visibility", "hidden");
+			letter.append(probe);
+			const length = probe.getComputedTextLength();
+			probe.remove();
+			return length;
+		}
+
 		function drawLetterPath() {
 			const w = innerWidth, h = innerHeight;
+			textLen = measureLetter();
 			letter.setAttribute("viewBox", `0 0 ${w} ${h}`);
 			const thumb = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--thumb"));
 			const big = size + thumb * 0.7;   // just outside the photos
@@ -434,7 +448,10 @@
 				ux > 0 ? (w + margin - tx) / ux : ux < 0 ? (-margin - tx) / ux : Infinity,
 				uy > 0 ? (h + margin - ty) / uy : uy < 0 ? (-margin - ty) / uy : Infinity
 			);
-			const out = toEdge(dx, dy), back = toEdge(-dx, -dy);
+			// the way out runs on past the screen edge by the whole letter's
+			// length. that way the text never needs a negative starting point,
+			// which safari doesn't handle reliably (the text froze there)
+			const out = toEdge(dx, dy) + textLen, back = toEdge(-dx, -dy);
 			const wayOut = [tx + dx * out, ty + dy * out];
 			const wayIn = [tx - dx * back, ty - dy * back];
 
@@ -442,7 +459,6 @@
 			letterPath.setAttribute("d",
 				"M " + points.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L "));
 			pathLen = letterPath.getTotalLength();
-			textLen = letterText.getComputedTextLength();
 		}
 
 		function letterFrame(time) {
@@ -450,7 +466,7 @@
 			letterLast = time;
 			offset -= LETTER_SPEED * dt;
 			// all of it has gone by: start again from the right edge
-			if (offset < -textLen) offset = pathLen;
+			if (offset < 0) offset = pathLen;
 			letterText.setAttribute("startOffset", offset.toFixed(1));
 			requestAnimationFrame(letterFrame);
 		}
