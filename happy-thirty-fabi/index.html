@@ -59,8 +59,9 @@
 			height: auto;
 			display: block;
 			z-index: 1;
-			/* centre the photo on its point, then move it out to that point */
-			transform: translate(-50%, -50%) translate(var(--x), var(--y));
+			/* centre the photo on its point, move it out to that point, and
+			   turn it if the screen is upright (--turn) */
+			transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--turn, 0deg));
 			/* hidden until play is pressed */
 			opacity: 0;
 			/* on the way back down, stay on top until fully shrunk (the
@@ -71,6 +72,10 @@
 				max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
 				z-index 0s 0.45s;
 		}
+
+		/* tall screens: as if the phone were held sideways, the photos are
+		   turned a quarter clockwise, the same way as the falling notes */
+		.orbit.is-upright > * { --turn: 90deg; }
 
 		.orbit.is-playing > * {
 			opacity: 1;
@@ -225,7 +230,7 @@
 	<!-- the letter runs along this path; js draws the path to match the ∞ -->
 	<svg class="letter" hidden>
 		<path id="letter-path" fill="none"/>
-		<text><textPath href="#letter-path">Fabi, my baby,   ·   I did not forget you. I am just late to the party. As always.   ·   As time goes by and people leave the picture (to be understood metaphorically, as the film that is my life), you remain. Which makes you one of the oldest standing trees in my tiny personal garden. And also… my oldest friend. Happy thirstiest (this was a typo, I will keep it) birthday, Fabi.   ·   It's such a sexy age. A sexy decade, really. I hope it brings you the most beautiful things in life: music, food and friendship. Oh, and good stories and literature. Great art, basically.   ·   You are probably my most beautiful and romantic friendship story. I look forward to dragging it on for many more years. I honestly can't wait to see more of the world with you, to help you climb giant birthday cakes (cf. one of the pictures), to explore musical niches, culinary feasts and fashion trends, to have endless pillow talks about our hopes and worries, to make sense of nonsense, to have a good-ass time, to goof around. To keep growing together.   ·   I love you so much.   ·   Happy birthday &lt;3</textPath></text>
+		<text><textPath href="#letter-path">Fabi, my baby,   ·   I did not forget you. I am just late to the party. As always.   ·   As time goes by and people leave the picture (to be understood metaphorically, as the film that is my life), you remain. Which makes you one of the oldest standing trees in my tiny personal garden. And also… my <tspan font-style="italic">oldest</tspan> friend. Happy thirstiest (this was a typo, I will keep it) birthday, Fabi.   ·   It's such a sexy age. A sexy decade, really. I hope it brings you the most beautiful things in life: music, food and friendship. Oh, and good stories and literature. Great art, basically.   ·   You are probably my most beautiful and romantic friendship story. I look forward to dragging it on for many more years. I honestly can't wait to see more of the world with you, to help you climb giant birthday cakes (cf. one of the pictures), to explore musical niches, culinary feasts and fashion trends, to have endless pillow talks about our hopes and worries, to make sense of nonsense, to have a good-ass time, to goof around. To keep growing together.   ·   I love you so much.   ·   Happy birthday &lt;3</textPath></text>
 	</svg>
 
 	<button class="play" type="button" aria-label="play song">
@@ -266,6 +271,7 @@
 		function measure() {
 			const w = innerWidth, h = innerHeight;
 			upright = h > w;
+			orbit.classList.toggle("is-upright", upright);
 			const long = upright ? h : w;
 			const short = upright ? w : h;
 			// the ∞ is 2·size long and about 0.7·size across; keep both on screen
